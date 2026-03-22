@@ -1,4 +1,4 @@
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const { messages, max_tokens } = req.body;
@@ -17,9 +17,13 @@ module.exports = async function handler(req, res) {
       }
     );
 
+    // Read response as text first so we can log it if it's not JSON
     const rawText = await response.text();
+
+    // Log it so you can see it in Vercel logs
     console.log("Gemini raw response:", rawText);
 
+    // Try to parse it
     let data;
     try {
       data = JSON.parse(rawText);
@@ -30,6 +34,7 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    // Check for API-level errors
     if (data.error) {
       console.error("Gemini API error:", data.error);
       return res.status(500).json({ 
@@ -37,6 +42,7 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    // Extract the text
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     if (!text) {
@@ -44,6 +50,7 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: "Gemini returned an empty response." });
     }
 
+    // Return in Anthropic-style format so frontend doesn't need to change
     res.status(200).json({
       content: [{ type: "text", text }]
     });
