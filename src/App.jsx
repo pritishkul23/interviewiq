@@ -539,14 +539,14 @@ Respond ONLY with valid JSON (no markdown fences) in this exact structure:
 
 Rules: matchSummary = 5-7 bullets on strengths/gaps/focus. Be specific to resume+JD. No invented facts. Open-ended questions only. category must be exactly: "role-fit", "experience", "behavioral", or "motivation".`;
 
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          max_tokens: 3000,
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
+   const res = await fetch("/api/generate", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    max_tokens: 3000,
+    messages: [{ role: "user", content: prompt }],
+  }),
+});
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error?.message || "API error");
