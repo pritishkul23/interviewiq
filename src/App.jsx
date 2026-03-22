@@ -539,11 +539,10 @@ Respond ONLY with valid JSON (no markdown fences) in this exact structure:
 
 Rules: matchSummary = 5-7 bullets on strengths/gaps/focus. Be specific to resume+JD. No invented facts. Open-ended questions only. category must be exactly: "role-fit", "experience", "behavioral", or "motivation".`;
 
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
           max_tokens: 3000,
           messages: [{ role: "user", content: prompt }],
         }),
