@@ -11,7 +11,7 @@ module.exports = async function handler(req, res) {
         "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "llama-3.3-70b-  satile",
         max_tokens: max_tokens || 3000,
         messages
       })
@@ -37,4 +37,30 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+}
+
+const requests = new Map();
+
+module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).end();
+
+  // Allow max 5 requests per IP per hour
+  const ip = req.headers['x-forwarded-for'] || 'unknown';
+  const now = Date.now();
+  const hourMs = 60 * 60 * 1000;
+  const record = requests.get(ip) || { count: 0, start: now };
+
+  if (now - record.start > hourMs) {
+    requests.set(ip, { count: 1, start: now });
+  } else if (record.count >= 5) {
+    return res.status(429).json({ 
+      error: { message: "Too many requests. Please try again in an hour." }
+    });
+  } else {
+    requests.set(ip, { count: record.count + 1, start: record.start });
+  }
+
+  // ... rest of your existing Groq code below unchanged
+  const { messages, max_tokens } = req.body;
+  // etc.
 }
